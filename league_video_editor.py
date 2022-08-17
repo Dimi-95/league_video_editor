@@ -8,18 +8,28 @@ import subprocess
 
 #Path to tesseract.exe
 pytesseract.pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
-video = "samples/short_error.mp4"
+video = "samples/test_george.mp4"
 cap = cv2.VideoCapture(video)
 fps = cap.get(cv2.CAP_PROP_FPS)
 total_num_of_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 duration_of_clip_in_seconds = total_num_of_frames / fps
 
 count = 0
-frames = 120
+frames = 90
 
 start = time.time()
 
+mode = int(input("--- Modes ---\n Focus on Kills: 1 \n Focus on Deaths (Not sure why you would want that): 2 \n Focus on Assists: 3 \n Smart Mode \n ENTER NUMBER: "))
+if(mode == 1 or mode == 2 or mode ==3):
+    print(f"mode set to {mode}")
+elif(mode == 4):
+    print(f"Smart mode enabled")
+else:
+    print("wrong input, mode has been set to 1")
+    mode = 1
+
 ##ADD THE SAME FUNCTION AS WITH THE CHANGE CONTRAST DIRECTORY, GOAL IS TO DO THIS ALL IN THE TMP FOLDER OF WINDOWS
+print("FRAMES ARE BEING EXTRACTED")
 while cap.isOpened():
     ret, frame = cap.read()
 
@@ -44,6 +54,7 @@ file_exists = exists(f"frames/frame{picture_number}.jpg")
 exist_2 = file_exists
 
 start = time.time()
+
 while(True):
     if(exist == False):
         print("No 'change_contrast' Folder detected, new one is being generated")
@@ -83,6 +94,7 @@ exist_3 = file_exists
 all_kills   = []
 all_deaths  = []
 all_assists = []
+bw_frame_cycle = 0
 
 #Getting the Kills Deaths Assists stored in arrays respectively
 while(True):
@@ -98,36 +110,55 @@ while(True):
                 if len(b) == 12:
                     #value is a string
                     value = b[11]
+        if(bw_frame_cycle == 0):
+            all_kills.append(0)
+            all_deaths.append(0)
+            all_assists.append(0)
+            bw_frame_cycle = bw_frame_cycle + 1 
+        else:
 
-        try:
-            if(value[0].isnumeric()):
-                kills = int(value[0])
-            else:
-                kills = all_kills[-1]
-            
-            if(value[2].isnumeric()):
-                deaths = int(value[2])
-            else:
-                deaths = all_deaths[-1]
-            
-            if(value[4].isnumeric()):
-                assists = int(value[4])
-            else:
-                assists = all_assists[-1]
 
-            print("Debug: ", kills, deaths, assists)
+            try:
+                if(value[0].isnumeric()):
+                    if(int(value[0]) >= all_kills[-1]):
+                        kills = int(value[0])
+                    else:
+                        kills = all_kills[-1]
+                else:
+                    kills = all_kills[-1]
+                
+                if(value[2].isnumeric()):
+                    if(int(value[2]) >= all_deaths[-1]):
+                        deaths = int(value[2])
+                    else:
+                        deaths = all_deaths[-1]
+                else:
+                    deaths = all_deaths[-1]
+                
+                if(value[4].isnumeric()):
+                    if(int(value[4]) >= all_assists[-1]):
+                        assists = int(value[4])
+                    else:
+                        assists = all_assists[-1]
+                else:
+                    assists = all_assists[-1]
 
-            all_kills.append(kills)
-            all_deaths.append(deaths)
-            all_assists.append(assists)
-            picture_number = picture_number + frames
-            exist_3 = exists(f"change_contrast/bw_frame{picture_number}.jpg")
-            pass
-        except:
-            print("entered the exception")
-            picture_number = picture_number + frames
-            exist_3 = True
-            continue
+                f = open("debug_KDA.txt", "a")
+                f.write(f"K/D/A {kills}/{deaths}/{assists}\n length of value {len(value)} \n \n")
+                print("Debug: ", kills, deaths, assists)
+                f.close()
+
+                all_kills.append(kills)
+                all_deaths.append(deaths)
+                all_assists.append(assists)
+                picture_number = picture_number + frames
+                exist_3 = exists(f"change_contrast/bw_frame{picture_number}.jpg")
+                pass
+            except:
+                print("entered the exception")
+                picture_number = picture_number + frames
+                exist_3 = True
+                continue
 
     else:
         print(f"All Kills:   {all_kills}")
@@ -151,36 +182,55 @@ begin_to_start = []
 length_of_clip = 0
 
 print("even detection starting")
+
+
+#KILLS
 i = 0
-condition_counter = len(all_kills)
+
+if(mode == 1):
+    detection_variable = all_kills
+elif(mode == 2):
+    detection_variable = all_deaths
+elif(mode == 3):
+    detection_variable = all_assists
+elif(mode == 4):
+    if(len(all_kills) > len(all_assists)):
+        detection_variable = all_kills
+    elif(len(all_kills) < len(all_assists)):
+        detection_variable = all_assists
+else:
+    detection_variable = all_kills
+
+
+condition_counter = len(detection_variable)
 print("Condition Counter: ", condition_counter)
 while(True):
       
     if(condition_counter - 1 != 0):
         print("entering PRE-comparison stage")
         print(i)
-        if(all_kills[i] != all_kills[i + 1]):
+        if(detection_variable[i] != detection_variable[i + 1]):
             print("DEBUG: entering comparison stage")
             #index + 1 to get the number of the element
             center_point_of_clip   = i + 1
-            print("DEBUG: center point: ", center_point_of_clip) #should be 115
+            print("DEBUG: center point: ", center_point_of_clip)
             #the point from which the clip we want starts, defined by the user time
             if(center_point_of_clip-user_defined_time < 0):
                 starting_point_of_clip = 0
             else:
                 starting_point_of_clip = center_point_of_clip - user_defined_time
             
-            print("DEBUG: starting point: ", starting_point_of_clip) #should be 105
+            print("DEBUG: starting point: ", starting_point_of_clip)
 
             if(center_point_of_clip + user_defined_time > duration_of_clip_in_seconds):
                 end_point_of_clip = duration_of_clip_in_seconds
             else:
                 end_point_of_clip = center_point_of_clip + user_defined_time
             
-            print("DEBUG: end point: ", end_point_of_clip) #should be 125
+            print("DEBUG: end point: ", end_point_of_clip)
 
 
-            length_of_clip = (end_point_of_clip - starting_point_of_clip)*seconds #should be 20
+            length_of_clip = (end_point_of_clip - starting_point_of_clip)*seconds
 
             #the beginning of the video up to the point the first cut happens
             first_cut = starting_point_of_clip * seconds
@@ -252,9 +302,11 @@ final_cmd = ["ffmpeg",
             "output_NOW.mp4"]        
 subprocess.call(final_cmd)   
 
-# files = glob.glob(f"C:\\Users\\DimitriosKasderidis\\Desktop\\Editing Software\\samples\\txt\\*")
-# for f in files:
-#     os.remove(f)
+#CLEANING UN NEEDED FILES
+files = glob.glob(f"C:\\Users\\DimitriosKasderidis\\Desktop\\Editing Software\\samples\\clips\\*")
+for f in files:
+    os.remove(f)
+os.remove("C:\\Users\\DimitriosKasderidis\\Desktop\\Editing Software\\clip_list.txt")
 
 
 #ToDo:
