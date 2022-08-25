@@ -1,3 +1,4 @@
+from pydoc import cli
 import cv2
 import time
 import os
@@ -163,6 +164,9 @@ while(True):
             pass
         except:
             print("entered the exception")
+            all_kills.append(all_kills[-1])
+            all_deaths.append(all_deaths[-1])
+            all_assists.append(all_assists[-1])
             picture_number = picture_number + frames
             exist_3 = True
             continue
@@ -178,7 +182,7 @@ while(True):
         break
 
 #Event detection
-seconds = frames/30
+seconds = frames/30 #120/30 = 4sec | user defined time = 4sec * the_amount_of_user
 user_defined_time      = 5
 center_point_of_clip   = 0
 starting_point_of_clip = 0
@@ -211,50 +215,61 @@ i = 0
 condition_counter = len(mode_setting)
 #print("Condition Counter: ", condition_counter)
 while(True):
-
-    if(condition_counter - 1 != 0):
+    #print("CONDITION COUNTER BEFORE: ", condition_counter)
+    if(condition_counter -1 != 0):
+        #print("CONDITION COUNTER AFTER: ", condition_counter)
         #print("DEBUG: entering PRE-comparison stage")
         #print("DEBUG: ", i)
         if(mode_setting[i] < mode_setting[i + 1]):
+            print("CONDITION COUNTER after detection: ", condition_counter)
             print("DEBUG: entering comparison stage")
             #index + 1 to get the number of the element
             center_point_of_clip   = i + 1
-            print("DEBUG: center point: ", center_point_of_clip) #should be 115
+            print("DEBUG: center point: ", center_point_of_clip)
             #the point from which the clip we want starts, defined by the user time
             if(center_point_of_clip-user_defined_time < 0):
                 starting_point_of_clip = 0
             else:
                 starting_point_of_clip = center_point_of_clip - user_defined_time
 
-            print("DEBUG: starting point: ", starting_point_of_clip) #should be 105
+            print("DEBUG: starting point: ", starting_point_of_clip)
 
-            if(center_point_of_clip + user_defined_time > duration_of_clip_in_seconds):
-                end_point_of_clip = duration_of_clip_in_seconds
+            if(center_point_of_clip + user_defined_time > len(mode_setting)):
+                end_point_of_clip = len(mode_setting)
             else:
                 end_point_of_clip = center_point_of_clip + user_defined_time
 
-            print("DEBUG: end point: ", end_point_of_clip) #should be 125
+            print("DEBUG: end point: ", end_point_of_clip)
 
 
-            length_of_clip = (end_point_of_clip - starting_point_of_clip)*seconds #should be 20
 
             #the beginning of the video up to the point the first cut happens
             first_cut = starting_point_of_clip * seconds
 
             begin_to_start.append(first_cut)
+            c = open("first_cut.txt", "a")
+            c.write(f"--- {first_cut} ---\n")
+            c.close()
+
 
             i = i + 1
             condition_counter = condition_counter - 1
 
 
-
-        i = i + 1
-        condition_counter = condition_counter - 1
+        else:
+            i = i + 1
+            condition_counter = condition_counter - 1
     else:
         print("event detection over")
         #print(f"seconds: {clip_container}")
         print(f"Timestamps and amount of clips -  Timestamps: {begin_to_start} Amount: {len(begin_to_start)}")
         break
+
+# if element 3 minus the user defined time (seconds * user defined time) equal or smaller than the element before
+# take element 3 and element 2, add their values and push it to a new array
+
+
+
 
 
 #begin + seconds of clip
@@ -262,13 +277,35 @@ while(True):
 amount_of_clips = len(begin_to_start)
 clip_counter = amount_of_clips
 clip_index = 0
+length_of_clip = seconds * user_defined_time
+
 
 print("Amount of clips: ", amount_of_clips)
 while(True):
     if(clip_counter != 0):
         print("clip_index", clip_index)
-        starting_time_ffmpeg = str(begin_to_start[clip_index])
-        finish_time_ffmpeg   = str(begin_to_start[clip_index] + length_of_clip)
+        #
+        if(begin_to_start[clip_index] - length_of_clip < 0):
+            starting_time_ffmpeg = "0"
+        else:
+            if(begin_to_start[clip_index - 1] + length_of_clip >= (begin_to_start[clip_index] - length_of_clip)):
+                starting_time_ffmpeg = str(begin_to_start[clip_index - 1] + length_of_clip)
+            else:
+                starting_time_ffmpeg = str(begin_to_start[clip_index] - length_of_clip)
+
+        
+
+
+        if(clip_counter == 1):
+            print("skip iteration")
+            finish_time_ffmpeg   = str(begin_to_start[clip_index] + length_of_clip)
+        else:
+            # if((begin_to_start[clip_index] + length_of_clip) > begin_to_start[clip_index + 1]):
+            #     finish_time_ffmpeg = str(begin_to_start[clip_index] + length_of_clip)
+            # else:
+            finish_time_ffmpeg = str(begin_to_start[clip_index] + length_of_clip)
+
+        
 
         clip = f"samples/clips/clip_{clip_index}.mp4"
         cmd = ["ffmpeg",
@@ -292,8 +329,8 @@ while(True):
     else:
         break
 
-print("break")
-time.sleep(4)
+    print("break")
+time.sleep(2)
 os.system(f"python fill_list.py {amount_of_clips}")
 
 final_cmd = ["ffmpeg",
@@ -308,5 +345,8 @@ final_cmd = ["ffmpeg",
             "output_NOW.mp4"]
 
         
-subprocess.call(final_cmd)   
+subprocess.call(final_cmd)
 
+files = glob.glob('samples/clips/*')
+for f in files:
+    os.remove(f)
