@@ -10,7 +10,7 @@ import number_finder
 
 #Path to tesseract.exe
 pytesseract.pytesseract.tesseract_cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
-video = "samples/test_george.mp4"
+video = "samples/az_2.mp4"
 cap = cv2.VideoCapture(video)
 fps = cap.get(cv2.CAP_PROP_FPS)
 total_num_of_frames = cap.get(cv2.CAP_PROP_FRAME_COUNT)
@@ -40,7 +40,6 @@ else:
 start = time.time()
 
 print("READING FRAMES")
-##ADD THE SAME FUNCTION AS WITH THE CHANGE CONTRAST DIRECTORY, GOAL IS TO DO THIS ALL IN THE TMP FOLDER OF WINDOWS
 while cap.isOpened():
     ret, frame = cap.read()
 
@@ -261,37 +260,37 @@ while(True):
             condition_counter = condition_counter - 1
     else:
         print("event detection over")
+        
         #print(f"seconds: {clip_container}")
         print(f"Timestamps and amount of clips -  Timestamps: {begin_to_start} Amount: {len(begin_to_start)}")
         break
-
-# if element 3 minus the user defined time (seconds * user defined time) equal or smaller than the element before
-# take element 3 and element 2, add their values and push it to a new array
-
-
-
-
-
-#begin + seconds of clip
 
 amount_of_clips = len(begin_to_start)
 clip_counter = amount_of_clips
 clip_index = 0
 length_of_clip = seconds * user_defined_time
 
+begin_of_game = True
+end_of_game = False
+
 
 print("Amount of clips: ", amount_of_clips)
 while(True):
     if(clip_counter != 0):
         print("clip_index", clip_index)
-        #
-        if(begin_to_start[clip_index] - length_of_clip < 0):
-            starting_time_ffmpeg = "0"
+        if(clip_index == 0):
+            if(begin_to_start[clip_index] - length_of_clip <= 0):
+                starting_time_ffmpeg = "0"
+            else:
+                starting_time_ffmpeg = str(begin_to_start[clip_index] - length_of_clip)
         else:
             if(begin_to_start[clip_index - 1] + length_of_clip >= (begin_to_start[clip_index] - length_of_clip)):
                 starting_time_ffmpeg = str(begin_to_start[clip_index - 1] + length_of_clip)
+                print("Clip index: ",clip_index,"  DEBUG IFFFF STATEMENT STARTING TIME: --------------------------- ",starting_time_ffmpeg,"------", begin_to_start[clip_index],"-----" ,length_of_clip)
+
             else:
                 starting_time_ffmpeg = str(begin_to_start[clip_index] - length_of_clip)
+            print("Clip index: ",clip_index,"  DEBUG ELSE STATEMENT STARTING TIME: --------------------------- ",starting_time_ffmpeg,"------", begin_to_start[clip_index],"-----" ,length_of_clip)
 
         
 
@@ -300,12 +299,11 @@ while(True):
             print("skip iteration")
             finish_time_ffmpeg   = str(begin_to_start[clip_index] + length_of_clip)
         else:
-            # if((begin_to_start[clip_index] + length_of_clip) > begin_to_start[clip_index + 1]):
-            #     finish_time_ffmpeg = str(begin_to_start[clip_index] + length_of_clip)
-            # else:
             finish_time_ffmpeg = str(begin_to_start[clip_index] + length_of_clip)
 
-        
+        times_recording = open("times.txt" , "a")
+        times_recording.write(f"Length of clip: {length_of_clip} \n Starting time: {starting_time_ffmpeg}\n Ending time: {finish_time_ffmpeg} \n")
+        times_recording.close()
 
         clip = f"samples/clips/clip_{clip_index}.mp4"
         cmd = ["ffmpeg",
