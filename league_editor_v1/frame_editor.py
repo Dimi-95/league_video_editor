@@ -10,9 +10,11 @@ import pytesseract
 import subprocess
 import tempfile
 
+
 def creating_folders_in_temp():
     frames_existence    = os.path.isdir(f"{tempfile.gettempdir()}\\frames")
     bw_frames_existence = os.path.isdir(f"{tempfile.gettempdir()}\\bw_frames")
+    clips_existence     = os.path.isdir(f"{tempfile.gettempdir()}\\clips")
 
 
     print("---")
@@ -27,6 +29,12 @@ def creating_folders_in_temp():
         os.mkdir(f"{tempfile.gettempdir()}\\frames")
     else:
         print(f"Folder 'frames' exists already. Path: {tempfile.gettempdir()}")
+
+    if(clips_existence == False):
+        print(f"Folder 'clips' has been created. Path: {tempfile.gettempdir()}")
+        os.mkdir(f"{tempfile.gettempdir()}\\clips")
+    else:
+        print(f"Folder 'clips' exists already. Path: {tempfile.gettempdir()}")
     print("---")
     print("\n")
 
@@ -44,6 +52,12 @@ def removing_folders_in_temp():
             os.remove(f)
         os.rmdir(f"{tempfile.gettempdir()}\\bw_frames")
         print("Folder 'bw_frames' has been removed")
+
+        files = glob.glob(f"{tempfile.gettempdir()}\\clips\\*")
+        for f in files:
+            os.remove(f)
+        os.rmdir(f"{tempfile.gettempdir()}\\clips")
+        print("Folder 'clips' has been removed")
         
 
 def read_video_and_create_frames(video_path, frames):
