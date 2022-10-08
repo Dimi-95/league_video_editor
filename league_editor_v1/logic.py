@@ -6,10 +6,14 @@ import time
 import os
 from os.path import exists
 import glob
+from numpy import concatenate
 import pytesseract
 import subprocess
 import tempfile
 import create_clip_list
+from moviepy.editor import *
+
+
 
 all_kills   = []
 all_deaths  = []
@@ -18,48 +22,51 @@ center_of_clip  = 0
 start_of_clip   = 0
 end_of_clip     = 0
 
+
 clip_timestamps = []
 
-def run_ffmpeg_through_cmd(video, starting_time_ffmpeg, finish_time_ffmpeg, clip, final_render, clip_list_result):
-    if(final_render == False):
-        cmd = ["ffmpeg",
-                    "-i",
-                    video,
-                    "-ss",
-                    starting_time_ffmpeg,
-                    "-to",
-                    finish_time_ffmpeg,
-                    "-c:v",
-                    "copy",
-                    "-c:a",
-                    "copy",
-                    clip
-                    ]
-        subprocess.call(cmd)
-    else:
-        subprocess.call(clip_list_result)
-        final_cmd_call = ["ffmpeg",
-            "-safe",
-            "0",
-            "-f",
-            "concat"
-            "-i"
-            "list.txt",
-            "-c",
-            "copy",
-            "output.mp4"]
-        subprocess.call(final_cmd_call)
+def run_ffmpeg_through_cmd(video, starting_time_ffmpeg, finish_time_ffmpeg, clip):
+    cmd = ["ffmpeg",
+                "-i",
+                video,
+                "-ss",
+                starting_time_ffmpeg,
+                "-to",
+                finish_time_ffmpeg,
+                "-c:v",
+                "copy",
+                "-c:a",
+                "copy",
+                clip
+                ]
+    subprocess.call(cmd)
+
+
+        
+def run_ffmpge_through_final_cmd():
+    final_cmd_call = ["ffmpeg",
+                        "-f",
+                        "concat",
+                        "-safe",
+                        "0",
+                        "-i",
+                        "clip_list.txt",
+                        "-c",
+                        "copy",
+                        "output.mp4"]
+    subprocess.call(final_cmd_call)
+
 
 
 
 def debug_kda_to_txt_file(kills, deaths, assists):
-    f = open("debug_KDA.txt" , "a")
+    f = open("debug_txt_files/debug_KDA.txt" , "a")
     f.write(f"Debug: {kills}/{deaths}/{assists}\n")
     f.close()
     print("Debug: ", kills, deaths, assists)
 
 def debug_times_recording_to_txt_file(clip_length, starting_time_ffmpeg, finish_time_ffmpeg):
-    times_recording = open("times.txt" , "a")
+    times_recording = open("debug_txt_files/times.txt" , "a")
     times_recording.write(f"Length of clip: {clip_length} \n Starting time: {starting_time_ffmpeg}\n Ending time: {finish_time_ffmpeg} \n")
     times_recording.close()
 
@@ -67,7 +74,7 @@ def debug_times_recording_to_txt_file(clip_length, starting_time_ffmpeg, finish_
 def getting_the_KDAs_and_store_them_in_array(frames):
     pytesseract.pytesseract.tesseract_cmd = "Tesseract-OCR\\tesseract.exe"
     image_number = 0
-    bw_image_exists = exists(f"{tempfile.gettempdir()}\\bw_frames\\bw_frame_{image_number}.jpg")
+    bw_image_exists = exists(f"bw_frames\\bw_frame_{image_number}.jpg")
     bw_image_check  = bw_image_exists
 
     cycle       = 0
@@ -80,7 +87,7 @@ def getting_the_KDAs_and_store_them_in_array(frames):
 
     while(True):
         if(bw_image_check):
-            image = cv2.imread(f"{tempfile.gettempdir()}\\bw_frames\\bw_frame_{image_number}.jpg")
+            image = cv2.imread(f"bw_frames\\bw_frame_{image_number}.jpg")
             image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
             data = pytesseract.image_to_data(image)
@@ -115,7 +122,7 @@ def getting_the_KDAs_and_store_them_in_array(frames):
                 all_deaths.append(deaths)
                 all_assists.append(assists)
                 image_number = image_number + frames
-                bw_image_check = exists(f"{tempfile.gettempdir()}\\bw_frames\\bw_frame_{image_number}.jpg")
+                bw_image_check = exists(f"bw_frames\\bw_frame_{image_number}.jpg")
                 pass
             except:
                 print("Debug: Faulty Image Detected and Ignored")
@@ -225,13 +232,14 @@ def editing_and_rendering(frames, interval_of_seconds, video):
             
             debug_times_recording_to_txt_file(clip_length, starting_time_ffmpeg, finish_time_fmpeg)
 
-            clip = f"{tempfile.gettempdir()}\\clips\\clip_{clip_index}.mp4"
+            clip = f"clip_{clip_index}.mp4"
 
-            run_ffmpeg_through_cmd(video, starting_time_ffmpeg, finish_time_fmpeg, clip, final_render, "")
+            run_ffmpeg_through_cmd(video, starting_time_ffmpeg, finish_time_fmpeg, clip)
             clip_index   = clip_index + 1
             clip_counter = clip_counter - 1
         else:
             break
-    clip_list_result = create_clip_list.create_list_of_clips(len(clip_timestamps))
+
     final_render = True
-    run_ffmpeg_through_cmd(video, starting_time_ffmpeg, finish_time_fmpeg, clip, final_render, clip_list_result)
+    create_clip_list.create_list_of_clips(len(clip_timestamps))
+    run_ffmpge_through_final_cmd()
