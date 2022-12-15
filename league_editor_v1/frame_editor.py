@@ -30,11 +30,11 @@ def creating_folders_in_temp():
     else:
         print(f"Folder 'frames' exists already.")
 
-    # if(clips_existence == False):
-    #     print(f"Folder 'clips' has been created.")
-    #     os.mkdir(f"clips")
-    # else:
-    #     print(f"Folder 'clips' exists already.")
+    if(clips_existence == False):
+        print(f"Folder 'clips' has been created.")
+        os.mkdir(f"clips")
+    else:
+        print(f"Folder 'clips' exists already.")
     print("---")
     print("\n")
 
@@ -53,11 +53,13 @@ def removing_folders_in_temp():
         os.rmdir(f"bw_frames")
         print("Folder 'bw_frames' has been removed")
 
-        # files = glob.glob(f"clips\\*")
-        # for f in files:
-        #     os.remove(f)
-        # os.rmdir(f"clips")
-        # print("Folder 'clips' has been removed")
+        files = glob.glob(f"clips\\*")
+        for f in files:
+            os.remove(f)
+        os.rmdir(f"clips")
+        print("Folder 'clips' has been removed")
+
+        os.remove("clip_list.txt")
         
 
 def read_video_and_create_frames(video_path, frames):

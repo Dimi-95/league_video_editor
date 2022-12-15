@@ -11,7 +11,6 @@ import pytesseract
 import subprocess
 import tempfile
 import create_clip_list
-from moviepy.editor import *
 
 
 
@@ -27,15 +26,13 @@ clip_timestamps = []
 
 def run_ffmpeg_through_cmd(video, starting_time_ffmpeg, finish_time_ffmpeg, clip):
     cmd = ["ffmpeg",
-                "-i",
-                video,
                 "-ss",
                 starting_time_ffmpeg,
                 "-to",
                 finish_time_ffmpeg,
-                "-c:v",
-                "copy",
-                "-c:a",
+                "-i",
+                video,
+                "-c",
                 "copy",
                 clip
                 ]
@@ -51,11 +48,10 @@ def run_ffmpge_through_final_cmd():
                         "0",
                         "-i",
                         "clip_list.txt",
-                        "-filter_complex",
-                        "xfade=transition=fade:duration=2:offset=5",
                         "-c",
                         "copy",
                         "output.mp4"]
+
     subprocess.call(final_cmd_call)
 
 
@@ -74,7 +70,7 @@ def debug_times_recording_to_txt_file(clip_length, starting_time_ffmpeg, finish_
 
 
 def getting_the_KDAs_and_store_them_in_array(frames):
-    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+    pytesseract.pytesseract.tesseract_cmd = r'dependencies\Tesseract-OCR\tesseract.exe'
     image_number = 0
     bw_image_exists = exists(f"bw_frames\\bw_frame_{image_number}.jpg")
     bw_image_check  = bw_image_exists
@@ -162,32 +158,24 @@ def event_detection(frames, interval_of_seconds, mode):
     condition_counter = len(set_mode)
     while(True):
         if(condition_counter -1 !=0):
-
             if(set_mode[i] < set_mode[i + 1]):
                 center_of_clip   = i + 1
-                if(center_of_clip - interval_of_seconds < 0):
+                if((center_of_clip * seconds) - interval_of_seconds < 0):
                     start_of_clip = 0
                 else:
-                    start_of_clip = center_of_clip - interval_of_seconds
+                    start_of_clip = (center_of_clip * seconds) - interval_of_seconds
 
                 print("DEBUG: starting point: ", start_of_clip)
-
-                if(center_of_clip + interval_of_seconds > len(set_mode)):
-                    end_of_clip = len(set_mode)
-                else:
-                    end_of_clip = center_of_clip + interval_of_seconds
-
-                print("DEBUG: end point: ", end_of_clip)
 
 
 
                 #the beginning of the video up to the point the first cut happens
-                first_cut = start_of_clip * seconds
+                first_cut = start_of_clip + interval_of_seconds
 
                 clip_timestamps.append(first_cut)
-                c = open("first_cut.txt", "a")
-                c.write(f"--- {first_cut} ---\n")
-                c.close()
+                # c = open("first_cut.txt", "a")
+                # c.write(f"--- {first_cut} ---\n")
+                # c.close()
 
 
                 i = i + 1
@@ -207,38 +195,33 @@ def editing_and_rendering(frames, interval_of_seconds, video):
     seconds      = frames/30
     clip_counter = len(clip_timestamps)
     clip_index   = 0
-    clip_length  = seconds * interval_of_seconds
     final_render = False
 
     print(f"Amount of existing clips: {clip_counter}")
+
+    finish_time_fmpeg = "0"
 
     while(True):
         #Starting Clip
         if(clip_counter != 0):
             if(clip_index == 0):
-                if(clip_timestamps[clip_index] - clip_length <= 0):
                     starting_time_ffmpeg = "0"
-                else:
-                    starting_time_ffmpeg = str(clip_timestamps[clip_index] - clip_length)
             else:
-                if(clip_timestamps[clip_index - 1] + clip_length >= (clip_timestamps[clip_index] - clip_length)):
-                    starting_time_ffmpeg = str(clip_timestamps[clip_index - 1] + clip_length)
+                if(float(finish_time_fmpeg) >= (clip_timestamps[clip_index] - interval_of_seconds)):
+                    starting_time_ffmpeg = finish_time_fmpeg
                 else:
-                    starting_time_ffmpeg = str(clip_timestamps[clip_index] - clip_length)
+                    starting_time_ffmpeg = str(clip_timestamps[clip_index] - interval_of_seconds)
 
             #Finishing Clip
-            if(clip_counter == 1):
-                finish_time_fmpeg = str(clip_timestamps[clip_index] + clip_length)
+            if(clip_index == 0):
+                finish_time_fmpeg = "15"
             else:
-                finish_time_fmpeg = str(clip_timestamps[clip_index] + clip_length)
-            
-            if(starting_time_ffmpeg == finish_time_fmpeg):
-                finish_time_fmpeg = str(clip_timestamps[clip_index] + clip_length + (seconds + interval_of_seconds))
-
+                finish_time_fmpeg = str(clip_timestamps[clip_index] + interval_of_seconds)
+                    
             
             #debug_times_recording_to_txt_file(clip_length, starting_time_ffmpeg, finish_time_fmpeg)
 
-            clip = f"clip_{clip_index}.mp4"
+            clip = f"clips/clip_{clip_index}.mp4"
 
             run_ffmpeg_through_cmd(video, starting_time_ffmpeg, finish_time_fmpeg, clip)
             clip_index   = clip_index + 1
