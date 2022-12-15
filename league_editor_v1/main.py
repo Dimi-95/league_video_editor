@@ -13,7 +13,7 @@ import frame_editor
 import logic
 
 frames                        = 120
-video                         = "video_sample_folder\\clip_1.mp4"
+video                         = "video_sample_folder\\test.mp4"
 seconds_between_clip_points = 15
 
 if __name__ == "__main__":
@@ -23,9 +23,6 @@ if __name__ == "__main__":
     
     #MODE
     mode = mode.choose_mode_to_let_the_algorithm_know_what_to_focus_on()
-
-    
-
 
     frame_editor.read_video_and_create_frames(video, frames)
     frame_editor.create_blk_and_wht_images_of_score(frames)

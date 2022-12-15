@@ -51,6 +51,8 @@ def run_ffmpge_through_final_cmd():
                         "0",
                         "-i",
                         "clip_list.txt",
+                        "-filter_complex",
+                        "xfade=transition=fade:duration=2:offset=5",
                         "-c",
                         "copy",
                         "output.mp4"]
@@ -72,7 +74,7 @@ def debug_times_recording_to_txt_file(clip_length, starting_time_ffmpeg, finish_
 
 
 def getting_the_KDAs_and_store_them_in_array(frames):
-    pytesseract.pytesseract.tesseract_cmd = "Tesseract-OCR\\tesseract.exe"
+    pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
     image_number = 0
     bw_image_exists = exists(f"bw_frames\\bw_frame_{image_number}.jpg")
     bw_image_check  = bw_image_exists
@@ -116,7 +118,7 @@ def getting_the_KDAs_and_store_them_in_array(frames):
                 else:
                     assists = int(value[2])
 
-                debug_kda_to_txt_file(kills, deaths, assists)
+                #debug_kda_to_txt_file(kills, deaths, assists)
 
                 all_kills.append(kills)
                 all_deaths.append(deaths)
@@ -230,7 +232,11 @@ def editing_and_rendering(frames, interval_of_seconds, video):
             else:
                 finish_time_fmpeg = str(clip_timestamps[clip_index] + clip_length)
             
-            debug_times_recording_to_txt_file(clip_length, starting_time_ffmpeg, finish_time_fmpeg)
+            if(starting_time_ffmpeg == finish_time_fmpeg):
+                finish_time_fmpeg = str(clip_timestamps[clip_index] + clip_length + (seconds + interval_of_seconds))
+
+            
+            #debug_times_recording_to_txt_file(clip_length, starting_time_ffmpeg, finish_time_fmpeg)
 
             clip = f"clip_{clip_index}.mp4"
 
