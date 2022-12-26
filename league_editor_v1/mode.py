@@ -8,7 +8,7 @@ import pytesseract
 import subprocess
 
 def choose_mode_to_let_the_algorithm_know_what_to_focus_on():
-    input_mode = input("--- CHOOSE MODE --- \n 1) to focus on Kills \n 2) to focus on Deaths \n 3) to focus on Assists \n 4) Smart selection (decides what is best to focus on)\n ENTER: ")    
+    input_mode = input("--- CHOOSE MODE --- \n 1) to focus on Kills \n 2) to focus on Deaths \n 3) to focus on Assists \n 4) Smart selection (Focuses on the bigger value between K and A)\n ENTER: ")    
     choosen_mode = int(input_mode)
 
     if(choosen_mode == 1):

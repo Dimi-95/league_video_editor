@@ -10,7 +10,7 @@ def create_list_of_clips(amount):
     while(True):
         if(amount != 0):
             f = open(f"clip_list.txt", "a")
-            f.write(f"\nfile 'clips/clip_{counter}.mp4'")
+            f.write(f"\nfile 'wip/clips/clip_{counter}.mp4'")
             f.close()
             counter = counter + 1 
             amount = amount - 1
