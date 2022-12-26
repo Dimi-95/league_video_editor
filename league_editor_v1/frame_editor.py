@@ -9,7 +9,7 @@ import glob
 import pytesseract
 import subprocess
 import tempfile
-
+import shutil
 
 def creating_folders_in_temp():
     work_in_progress    = os.path.isdir(f"wip")
@@ -47,32 +47,13 @@ def creating_folders_in_temp():
 
 def removing_folders_in_temp():
         print("---")
-        files = glob.glob(f"wip\\*")
-        for f in files:
-            os.remove(f)
-        os.rmdir(f"wip")
+        #files = glob.glob(f"wip\\*")
+        # for f in files:
+        #     os.chmod(f, 0o777)
+        #     os.remove(f)
+        # os.rmdir(f"wip")
+        shutil.rmtree("wip")
         print("Folder 'wip' has been removed")
-
-        # files = glob.glob(f"frames\\*")
-        # for f in files:
-        #     os.remove(f)
-        # os.rmdir(f"frames")
-        # print("Folder 'frames' has been removed")
-
-        # files = glob.glob(f"bw_frames\\*")
-        # for f in files:
-        #     os.remove(f)
-        # os.rmdir(f"bw_frames")
-        # print("Folder 'bw_frames' has been removed")
-
-        # files = glob.glob(f"clips\\*")
-        # for f in files:
-        #     os.remove(f)
-        # os.rmdir(f"clips")
-        # print("Folder 'clips' has been removed")
-
-
-
         os.remove("clip_list.txt")
         
 
