@@ -61,7 +61,8 @@ def getting_the_KDAs_and_store_them_in_array(frames):
     bw_image_exists = exists(f"wip\\bw_frames\\bw_frame_{image_number}.jpg")
     bw_image_check  = bw_image_exists
 
-    cycle       = 0
+    cycle            = 0
+    new_game_counter = 0
 
     if(cycle == 0):
         all_kills.append(0)
@@ -109,12 +110,19 @@ def getting_the_KDAs_and_store_them_in_array(frames):
                 bw_image_check = exists(f"wip\\bw_frames\\bw_frame_{image_number}.jpg")
                 pass
             except:
+                if(new_game_counter == 30):
+                    all_kills.append(0)
+                    all_deaths.append(0)
+                    all_assists.append(0)
+                    new_game_counter = 0
+
                 print("Debug: Faulty Image Detected and Ignored")
                 all_kills.append(all_kills[-1])
                 all_deaths.append(all_deaths[-1])
                 all_assists.append(all_assists[-1])
                 image_number = image_number + frames
                 bw_image_check = True
+                new_game_counter = new_game_counter + 1
                 continue
         else:
             print(f"All Kills:   {all_kills}")

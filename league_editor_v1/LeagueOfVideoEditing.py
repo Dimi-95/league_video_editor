@@ -12,15 +12,15 @@ from tkinter import filedialog as fidia
 import mode
 import frame_editor
 import logic
+import convert_video_codec
 
 frames                        = 120
-video                         =  fidia.askopenfilename(title="L.O.V.E. (beta version) Choose your VOD")
 seconds_between_clip_points = 15
 
 if __name__ == "__main__":
     #FRAME EDITOR
     frame_editor.creating_folders_in_temp()
-    
+    video = convert_video_codec.convert_video_codec()
     
     #MODE
     mode = mode.choose_mode_to_let_the_algorithm_know_what_to_focus_on()
