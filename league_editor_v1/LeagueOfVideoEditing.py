@@ -16,11 +16,13 @@ import convert_video_codec
 
 frames                        = 120
 seconds_between_clip_points = 15
+video = fidia.askopenfilename(title="L.O.V.E. (beta version) Choose your VOD")
 
 if __name__ == "__main__":
     #FRAME EDITOR
     frame_editor.creating_folders_in_temp()
-    video = convert_video_codec.convert_video_codec()
+    
+    #video = convert_video_codec.convert_video_codec()
     
     #MODE
     mode = mode.choose_mode_to_let_the_algorithm_know_what_to_focus_on()
@@ -31,7 +33,8 @@ if __name__ == "__main__":
     logic.getting_the_KDAs_and_store_them_in_array(frames)
     logic.event_detection(frames, seconds_between_clip_points, mode)
     logic.editing_and_rendering(frames, seconds_between_clip_points, video)
-    frame_editor.removing_folders_in_temp()
+    convert_video_codec.convert_video_to_new_mp4_container()
+    frame_editor.removing_folders_and_files_in_temp()
 
 
 

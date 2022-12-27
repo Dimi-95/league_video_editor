@@ -24,3 +24,13 @@ def convert_video_codec ():
         return video
     else:
         return video
+
+def convert_video_to_new_mp4_container ():
+    cmd = ["ffmpeg",
+                    "-i",
+                    "output.mp4",
+                    "-preset",
+                    "ultrafast",
+                    "f_output.mp4"
+                    ]
+    subprocess.call(cmd)

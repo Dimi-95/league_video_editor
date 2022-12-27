@@ -45,7 +45,7 @@ def creating_folders_in_temp():
     print("\n")
 
 
-def removing_folders_in_temp():
+def removing_folders_and_files_in_temp():
         print("---")
         #files = glob.glob(f"wip\\*")
         # for f in files:
@@ -55,6 +55,7 @@ def removing_folders_in_temp():
         shutil.rmtree("wip")
         print("Folder 'wip' has been removed")
         os.remove("clip_list.txt")
+        os.remove("output.mp4")
         
 
 def read_video_and_create_frames(video_path, frames):
