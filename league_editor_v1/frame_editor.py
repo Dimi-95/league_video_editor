@@ -87,10 +87,14 @@ def create_blk_and_wht_images_of_score(frames):
             width  = image.shape[1]
             height = image.shape[0]
 
-
-            gray_image      = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            focus_on_score  = gray_image[0:25, int(width/2)+705:width-180]
-            resize          = cv2.resize(focus_on_score, (100,50))
+            if(width >= 1920):
+                gray_image      = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                focus_on_score  = gray_image[0:25, int(width/2)+705:width-180]
+                resize          = cv2.resize(focus_on_score, (100,50))
+            elif(width <= 1280):
+                gray_image      = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                focus_on_score  = gray_image[0:25, int(width/2) + 470:width - 105]
+                resize          = cv2.resize(focus_on_score, (250,100))
 
             (thresh, black_and_white_image) = cv2.threshold(resize, 118, 255, cv2.THRESH_BINARY )
             cv2.imwrite(f"wip\\bw_frames\\bw_frame_{image_number}.jpg", black_and_white_image)
