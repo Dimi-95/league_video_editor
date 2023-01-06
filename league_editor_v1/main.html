@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L.O.V.E (Beta)</title>
+    <link rel="shortcut icon" type="image/x-icon" href="icon.ico">
+    <link rel="stylesheet" href="style.css">
+
+    <script src="eel.js"></script>
+
+    <script>
+        function callPython(){
+            eel.download_tw_clip()
+        }
+    </script>
+
+</head>
+<body>
+    <div class="clip_input">
+        
+        <span id="title">League Of Video Editing</span>
+        <label for="twitch_url" id="twitch_url">Paste the link of your Twitch VOD here</label>
+        <input type="url" name="twitch_url" id="twitch_url" placeholder="https://www.twitch.tv/videos/12345678">
+        
+
+        <!-- <input type="button" id="download_button" value="clickme" onclick="eel.download_vod_from_twitch(vod, start, end)"> -->
+        <input type="button" id="download_button" value="test me" onclick="callPython()">
+
+        <input type="file" id="myFileInput" accept=".mp4">
+        <input type="button" id="select_button" onclick="document.getElementById('myFileInput').click()"
+        value="Select a VOD to Edit">
+        
+
+    </div>
+    
+</body>
+</html>

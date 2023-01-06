@@ -89,17 +89,26 @@ def getting_the_KDAs_and_store_them_in_array(frames):
                 if(all_kills[-1] > int(value[0])):
                     kills = all_kills[-1]
                 else:
-                    kills = int(value[0])
+                    if(int(value[0]) > (all_kills[-1]+2)):
+                        kills = all_kills[-1] + 1
+                    else: 
+                        kills = int(value[0])
 
                 if(all_deaths[-1] > int(value[1])):
                     deaths = all_deaths[-1]
                 else:
-                    deaths = int(value[1])
+                    if(int(value[0]) > (all_deaths[-1]+2)):
+                        deaths = all_deaths[-1] + 1
+                    else: 
+                        deaths = int(value[0])
 
                 if(all_assists[-1] > int(value[2])):
                     assists = all_assists[-1]
                 else:
-                    assists = int(value[2])
+                    if(int(value[0]) > (all_assists[-1]+2)):
+                        assists = all_assists[-1] + 1
+                    else: 
+                        assists = int(value[0])
 
                 #debug_kda_to_txt_file(kills, deaths, assists)
 
@@ -215,7 +224,10 @@ def editing_and_rendering(frames, interval_of_seconds, video):
 
             run_ffmpeg_through_cmd(video, starting_time_ffmpeg, finish_time_fmpeg, clip)
             clip_index   = clip_index + 1
-            clip_counter = clip_counter - 1
+            if(str(clip_timestamps[clip_index]) == "0"):
+                clip_counter = clip_counter
+            else:
+                clip_counter = clip_counter + 1
         else:
             break
 

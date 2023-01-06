@@ -1,0 +1,58 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+#myFileInput {
+    display:none;
+}
+
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.clip_input{
+    display: flex;
+    flex-direction: column;
+}
+
+#title{
+    font-size: 30px;
+    font-weight: 600;
+    font-family:'Roboto';
+
+}
+
+input{
+    height: 40px;
+    width: 400px;
+    border:none;
+    font-size: 20px;
+    border: 2px solid transparent;
+    font-family: 'Roboto';
+    border-radius: 10px;
+    margin: 10px;
+
+}
+
+input:focus{
+    border: 4px solid #0AC8B9;
+}
+
+#select_button{
+    height: 60px;
+    border: none;
+    color: #C89B3C;
+    font-family: 'Roboto';
+    font-size: 25px;
+    background-color: #005A82;
+    cursor: pointer;
+}
+
+#twitch_url{
+    font-family: 'Roboto';
+}
+
+#download_button{
+    cursor: pointer;
+}
