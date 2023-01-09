@@ -13,7 +13,6 @@ import tempfile
 import create_clip_list
 
 
-
 all_kills   = []
 all_deaths  = []
 all_assists = []
@@ -224,10 +223,7 @@ def editing_and_rendering(frames, interval_of_seconds, video):
 
             run_ffmpeg_through_cmd(video, starting_time_ffmpeg, finish_time_fmpeg, clip)
             clip_index   = clip_index + 1
-            if(str(clip_timestamps[clip_index]) == "0"):
-                clip_counter = clip_counter
-            else:
-                clip_counter = clip_counter + 1
+            clip_counter = clip_counter - 1
         else:
             break
 

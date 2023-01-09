@@ -1,14 +1,12 @@
 import subprocess
-import eel
 
-@eel.expose
-def download_vod_from_twitch(vod, start, end):
+def download_vod_from_twitch(vod):
     cmd =["twitch-dl",
             "download",
             "-s",
-            start,
+            "00:00:00",
             "-e",
-            end,
+            "00:05:00",
             vod,
             "-q",
             "1080p",
@@ -16,7 +14,3 @@ def download_vod_from_twitch(vod, start, end):
             "tw_download.mp4"
             ]
     subprocess.call(cmd)
-
-@eel.expose
-def hello():
-        print("Hello")
