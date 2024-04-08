@@ -12,3 +12,5 @@ Dependencies:
 - shutil
 - tkinter
 - time
+
+https://youtu.be/N96SoFErUkE
